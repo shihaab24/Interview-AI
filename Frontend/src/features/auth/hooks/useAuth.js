@@ -9,64 +9,77 @@ export const useAuth = () => {
     const {user,setUser,loading,setLoading} = context;
     
     const handleLogin = async ({email,password}) => {
-        
         setLoading(true);
-
         try {
             const data = await login({email,password});
-            setUser(data.user)
+            if (data && data.token) {
+                localStorage.setItem("token", data.token);
+            }
+            if (data && data.user) {
+                setUser(data.user);
+            }
         }catch(err){
-
+            console.error("Login hook failed:", err);
+            throw err;
         }finally{
-            setLoading(false)
+            setLoading(false);
         }
     }
 
     const handleRegister = async ({username,email,password}) => {
-
-        setLoading(true)
-
+        setLoading(true);
         try{
             const data = await register({username,email,password});
-            setUser(data.user);
+            if (data && data.token) {
+                localStorage.setItem("token", data.token);
+            }
+            if (data && data.user) {
+                setUser(data.user);
+            }
         }catch(err){
-
+            console.error("Registration hook failed:", err);
+            throw err;
         }finally{
-            setLoading(false)
+            setLoading(false);
         }
     }
 
     const handleLogout = async () => {
-
         setLoading(true);
-
         try{
-        const data = await logout();
-        setUser(null);
+            await logout();
         }catch(err){
-
+            console.error("Logout hook failed:", err);
         }finally{
-            setLoading(false)
+            localStorage.removeItem("token");
+            setUser(null);
+            setLoading(false);
         }
     }
 
 
     useEffect(() => {
-                const getAndSetUser = async () => {
-                    setLoading(true);
-                    try{
-                        const data = await getMe();
-                        console.log("User authenticated:", data);
-                        setUser(data.user);
-                    } catch (error) {
-                        console.error("Error fetching user data:", error);
-                        console.log("Token cookie exists:", document.cookie);
-                    } finally {
-                        setLoading(false);
-                    }
+        const getAndSetUser = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                return;
+            }
+            setLoading(true);
+            try{
+                const data = await getMe();
+                if (data && data.user) {
+                    setUser(data.user);
                 }
-                getAndSetUser();
-            }, [])
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                localStorage.removeItem("token");
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        }
+        getAndSetUser();
+    }, [])
 
 
     return {user,loading,handleLogin,handleRegister,handleLogout}

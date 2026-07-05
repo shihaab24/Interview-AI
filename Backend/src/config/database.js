@@ -4,7 +4,8 @@ require ('dotenv').config()
 async function connectToDB () {
 
     try{
-        await mongoose.connect(process.env.MONGO_URI);
+        const dbUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+        await mongoose.connect(dbUri);
         console.log("connected to DB");
 
     }catch(err){

@@ -1,14 +1,12 @@
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3000/api/auth';
+import api from '../../../services/api.js';
 
 export const register = async ({username, email, password}) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/register`, {
+    const response = await api.post(`/api/auth/register`, {
       username,
       email,
       password,
-    }, { withCredentials: true });
+    });
     return response.data;
   } catch (err) {
     console.log(err);
@@ -18,10 +16,10 @@ export const register = async ({username, email, password}) => {
 
 export const login = async ({email, password}) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/login`, {
+    const response = await api.post(`/api/auth/login`, {
       email,
       password,
-    }, { withCredentials: true });
+    });
     return response.data;
   } catch (err) {
     console.log(err);
@@ -31,7 +29,7 @@ export const login = async ({email, password}) => {
 
 export const logout = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/logout`, { withCredentials: true });
+    const response = await api.get(`/api/auth/logout`);
     return response.data;
   } catch (err) {
     console.log(err);
@@ -41,7 +39,7 @@ export const logout = async () => {
 
 export const getMe = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/get-me`, { withCredentials: true });
+    const response = await api.get(`/api/auth/get-me`);
     return response.data;
   } catch (err) {
     console.log(err);
